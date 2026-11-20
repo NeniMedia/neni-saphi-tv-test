@@ -1,0 +1,26 @@
+[
+  {
+    "file": "metropolis.jpg",
+    "title": "Metropolis",
+    "author": "Boris Bilinsky (1900–1948)",
+    "rights": "PD-Art / public domain; life plus 75 years",
+    "source": "https://commons.wikimedia.org/wiki/File:Boris_Bilinski_-_Filmplakat_f%C3%BCr_Metropolis.jpg",
+    "adaptation": "Locally stored 500px Wikimedia thumbnail for sample-mode interface testing; generated test video, not the feature film"
+  },
+  {
+    "file": "caligari.jpg",
+    "title": "The Cabinet of Dr. Caligari",
+    "author": "Rudolf Ledl (1887–1945)",
+    "rights": "Public domain; life plus 80 years; pre-1931 publication",
+    "source": "https://commons.wikimedia.org/wiki/File:Das_Cabinet_des_Dr._Caligari.JPG",
+    "adaptation": "Locally stored 500px Wikimedia thumbnail for sample-mode interface testing; generated test video, not the feature film"
+  },
+  {
+    "file": "caligari-red.jpg",
+    "title": "The Cabinet of Dr. Caligari",
+    "author": "Atelier Ledl Bernhard / Rudolf Ledl (1887–1945)",
+    "rights": "Public domain; life plus 80 years; pre-1931 publication",
+    "source": "https://commons.wikimedia.org/wiki/File:Das_Kabinett_des_Doktor_Caligari_1920_Poster.jpg",
+    "adaptation": "Locally stored 500px Wikimedia thumbnail for sample-mode interface testing; generated test video, not the feature film"
+  }
+]
