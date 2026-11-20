@@ -45,13 +45,23 @@ class FixtureApp:
     def cookie(self, value, age=7200):
         return ('Set-Cookie', f'{COOKIE}={value}; Path=/; Max-Age={age}; Secure; HttpOnly; SameSite=Lax')
 
-    def configured(self):
+    def config_checks(self):
         c = self.config
         try:
-            valid = c.get('TEST_ENABLED') == 'true' and int(c.get('TEST_EXPIRES_AT', '0')) > self.clock()
-        except ValueError:
-            return False
-        return bool(valid and re.fullmatch(r'[a-z0-9.-]+(?::[0-9]{1,5})?', c.get('TEST_HOST', '')) and re.fullmatch(r'[0-9a-f]{32}', c.get('TEST_PIN_SALT', '')) and re.fullmatch(r'[0-9a-f]{64}', c.get('TEST_PIN_HASH', '')))
+            seconds_remaining = int(c.get('TEST_EXPIRES_AT', '0')) - self.clock()
+            expiry_valid = 0 < seconds_remaining <= 48*3600 + 60
+        except (ValueError, TypeError):
+            expiry_valid = False
+        return {
+            'TEST_ENABLED': c.get('TEST_ENABLED') == 'true',
+            'TEST_HOST': bool(re.fullmatch(r'[a-z0-9.-]+(?::[0-9]{1,5})?', c.get('TEST_HOST', ''))),
+            'TEST_PIN_SALT': bool(re.fullmatch(r'[0-9a-f]{32}', c.get('TEST_PIN_SALT', ''))),
+            'TEST_PIN_HASH': bool(re.fullmatch(r'[0-9a-f]{64}', c.get('TEST_PIN_HASH', ''))),
+            'TEST_EXPIRES_AT': expiry_valid,
+        }
+
+    def configured(self):
+        return all(self.config_checks().values())
 
     def session(self, environ):
         cookie = SimpleCookie()
@@ -139,9 +149,12 @@ class FixtureApp:
         path = environ.get('PATH_INFO', '/')
         method = environ['REQUEST_METHOD']
         if path == '/healthz' and method in ('GET', 'HEAD'):
+            if parse_qs(environ.get('QUERY_STRING','')).get('config') == ['1']:
+                checks = self.config_checks()
+                return self.reply(start, 200, {'ready': all(checks.values()), 'checks': checks, 'host_matches_request': self.config.get('TEST_HOST') == environ.get('HTTP_HOST')}, method=method)
             return self.reply(start, 200, b'OK', 'text/plain', method=method)
         if not self.configured():
-            return self.reply(start, 410, {'error':'This temporary test is disabled or expired.'})
+            return self.reply(start, 410, {'error':'This temporary test is disabled or expired.'}, method=method)
         host = self.config['TEST_HOST']
         if environ.get('HTTP_HOST') != host:
             return self.reply(start, 403, {'error':'invalid_host'})
